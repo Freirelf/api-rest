@@ -4,8 +4,12 @@ import { z } from 'zod'
 import { randomUUID } from 'crypto'
 import { checkSessionIdExists } from '../../middlewares/check-session-id-exists'
 
-export async function transactionsRoutes(server: FastifyInstance) {
-  server.get(
+export async function transactionsRoutes(app: FastifyInstance) {
+  app.addHook('preHandler', async (request) => {
+    console.log(`[${request.method}] ${request.url}`)
+  })
+
+  app.get(
     '/',
     {
       preHandler: [checkSessionIdExists],
@@ -21,7 +25,7 @@ export async function transactionsRoutes(server: FastifyInstance) {
     },
   )
 
-  server.get(
+  app.get(
     '/summary',
     {
       preHandler: [checkSessionIdExists],
@@ -38,7 +42,7 @@ export async function transactionsRoutes(server: FastifyInstance) {
     },
   )
 
-  server.get(
+  app.get(
     '/:id',
     {
       preHandler: [checkSessionIdExists],
@@ -63,7 +67,7 @@ export async function transactionsRoutes(server: FastifyInstance) {
     },
   )
 
-  server.post('/', async (request, reply) => {
+  app.post('/', async (request, reply) => {
     const createTransactionsBodySchema = z.object({
       title: z.string(),
       amount: z.number(),
